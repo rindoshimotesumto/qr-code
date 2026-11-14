@@ -1,6 +1,7 @@
-from locust import HttpUser, task, constant_throughput
+from locust import FastHttpUser, task, constant_throughput
 
-class QRLoadTest(HttpUser):
+
+class QRLoadTest(FastHttpUser):
     # Гарантирует ровно 1 запрос в секунду от каждого виртуального юзера
     # Если запустить 100 юзеров — получишь ровно 100 RPS
     wait_time = constant_throughput(1)

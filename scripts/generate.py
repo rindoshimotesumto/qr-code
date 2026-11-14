@@ -1,6 +1,8 @@
 import io
 import qrcode
 
+from functools import lru_cache
+
 from qrcode.image.pure import PyPNGImage
 from qrcode.image.svg import SvgPathImage
 from qrcode.constants import ERROR_CORRECT_L
@@ -8,10 +10,11 @@ from qrcode.constants import ERROR_CORRECT_L
 from entities.qrcode import QRCodeTypes
 
 
+@lru_cache(maxsize=1024)
 def generate_qr(
     data: str,
     format: QRCodeTypes = QRCodeTypes.png,
-) -> tuple[io.BytesIO, str]:
+) -> tuple[bytes, str]:
     
     qr = qrcode.QRCode(
         version=None,
@@ -24,14 +27,15 @@ def generate_qr(
     qr.make(fit=True)
 
     if format == QRCodeTypes.png:
-        _image_factory = PyPNGImage
+        image_factory = PyPNGImage
+        media_type = "image/png"
     else:
-        _image_factory = SvgPathImage
+        image_factory = SvgPathImage
+        media_type = "image/svg+xml"
     
-    img = qr.make_image(image_factory=_image_factory)    
+    img = qr.make_image(image_factory=image_factory)    
     buf = io.BytesIO()
 
     img.save(buf)
-    buf.seek(0)
 
-    return buf, f"image/{format.value}"
+    return buf.getvalue(), media_type

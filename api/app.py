@@ -20,4 +20,4 @@ def generate_qrcode(qrcode: QRCode):
         format=qrcode.format
     )
 
-    return Response(content=buf.getvalue(), media_type=media_type)
+    return Response(content=buf, media_type=media_type)
